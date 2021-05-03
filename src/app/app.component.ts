@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { TimerVisualOption } from './timer/timer-enum';
-import { TimerInfo } from './timer/timer.component';
+import { DateTimeService } from './services/date-time.service';
+import { TimerOption, TimerVisualOption } from './timer.models/timer-enum';
+import { TimerInfo } from './timer.models/timer-info.model';
 
 @Component({
   selector: 'app-root',
@@ -8,40 +9,43 @@ import { TimerInfo } from './timer/timer.component';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'angular-project';
 
   public hours: number | undefined;
   public minutes: number | undefined;
   public seconds: number | undefined;
 
-  public visualOptions: TimerVisualOption | undefined;
-  public timerOptions: TimerVisualOption | undefined;
+  public visualOptions = TimerVisualOption.Full;
+  public timerOptions = TimerOption.Countdown;
 
-  public timersInfo: Array<TimerInfo> = []; // TimerData ;
+
+  public timersInfo: Array<TimerInfo> = []; 
+
+  private dateService = new DateTimeService();
 
   public addTimer(): void {
     let info = new TimerInfo();
-    info.startTime = this.getTimeUtc( new Date());
-    info.endTime = this.getTimeUtc( this.getTimerTime()); 
-    info.totalTime = this.difference(info.startTime, info.endTime);
-
+    info.endTime = this.dateService.getTimeUtc(this.getTimerTime()); 
+    info.totalTime = new Date(); 
+    info.type = this.timerOptions;
+    info.visualOptions = this.visualOptions;
 
     this.timersInfo.push(info);
-    //debugger;
+
+    this.clearProps();
   }
 
-  private getTimeUtc(date: Date) : Date {
-    var now_utc = Date.UTC(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate(),
-      date.getUTCHours(),
-      date.getUTCMinutes(),
-      date.getUTCSeconds()
-    );
-
-    return new Date(now_utc);
+  public remove(index: number):void{
+    this.timersInfo.slice(index,1);
   }
+
+  public clear(index: number):void{
+    
+  }
+
+  public fixed(index: number):void{
+    
+  }
+
 
   private getTimerTime(): Date{
     let dt = new Date();
@@ -58,11 +62,11 @@ export class AppComponent {
     return dt;
   }
 
-  private difference(startDate: Date, endDate: Date): Date {
-    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
-    let dt = new Date();
-    dt.setSeconds(seconds);
- 
-    return this.getTimeUtc(dt);
+  private clearProps():void{
+    this.hours = undefined;
+    this.minutes = undefined;
+    this.seconds = undefined;
+    this.visualOptions = TimerVisualOption.Full;
+    this.timerOptions = TimerOption.Countdown;
   }
 }

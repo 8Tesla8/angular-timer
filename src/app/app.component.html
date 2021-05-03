@@ -24,7 +24,6 @@
 
       <div class="input-group mb-3">
         <select [(ngModel)]="visualOptions" class="form-select" id="visulaOptions">
-          <option selected>Choose...</option>
           <option value="full">Full</option>
           <option value="small">Small</option>
         </select>
@@ -39,10 +38,8 @@
 
       <div class="input-group mb-3">
         <select [(ngModel)]="timerOptions" class="form-select" id="Timer options">
-          <option selected>Choose...</option>
           <option value="fixed">Fixed</option>
           <option value="countdown">Countdown</option>
-          <option value="Clear">Clear</option>
         </select>
 
         <label class="input-group-text" for="Timer options">Timer options</label>
@@ -64,14 +61,19 @@
 
 
   
-  <div class="row" *ngFor="let info of timersInfo">
+  <div class="row" *ngFor="let info of timersInfo; let indexOfelement=index;">
 
-    <app-timer [info]="info">
-
-    </app-timer> 
     <div class="col"> 
-
+      <app-timer [info]="info">
+      </app-timer> 
     </div>
+
+    <div class="col">
+      <button (click)="remove(indexOfelement)" type="button" class="btn btn-primary">Fixed</button>
+      <button (click)="remove(indexOfelement)" type="button" class="btn btn-dark">Clear</button>
+      <button (click)="remove(indexOfelement)" type="button" class="btn btn-danger">Remove</button>
+    </div>
+
 
   </div>
 
@@ -79,9 +81,3 @@
 
 
 
-
-<div>
-  <button>Fixed</button>
-  <button>Clear</button>
-  <button>Remove</button>
-</div>

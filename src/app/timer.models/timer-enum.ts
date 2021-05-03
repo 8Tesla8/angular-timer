@@ -4,8 +4,7 @@ export enum TimerVisualOption{
   }
   
   export enum TimerOption{
-    None = "none",  
     ShowFixedTime = "fixed",
-    CountDown = "countDown",
+    Countdown = "countdown",
     Clear = "clear",
   }
