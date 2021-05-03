@@ -75,8 +75,8 @@ export class DateTimeService {
 }
 
 export class ReadableTimeSpan{
-    public days: number;
-    public hours: number;
-    public minutes: number;
-    public seconds: number;
+    public days: number =0;
+    public hours: number =0;
+    public minutes: number =0;
+    public seconds: number =0;
 }

@@ -1,33 +1,32 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { DateTimeService } from '../services/date-time.service';
 import { TimerOption, TimerVisualOption } from '../timer.models/timer-enum';
 import { TimerInfo } from '../timer.models/timer-info.model';
-
-//https://www.w3schools.com/howto/howto_js_countdown.asp
 
 @Component({
   selector: 'app-timer',
   templateUrl: './timer.component.html',
   styleUrls: ['./timer.component.scss'],
 })
-export class TimerComponent implements OnInit {
+export class TimerComponent {
+
   @Input()
-  public info: TimerInfo;
+  set info(value: TimerInfo) {
+    this._info = value;
+    this.checkType(this.info.type);
+  }
+
+  get info(): TimerInfo {
+    return this._info;
+  }
 
   public countdownString = '';
 
+  public _info: TimerInfo;
   private interval: ReturnType<typeof setTimeout> ;
   private dateService = new DateTimeService()
 
-  private presState = TimerOption.ShowFixedTime;
-
   constructor() {}
-
-  ngOnInit(): void {
-    // this.startTimer();
-    debugger;
-    this.checkType(this.info.type);
-  }
 
 
   public checkType (timerOption: TimerOption) : void{
@@ -38,18 +37,39 @@ export class TimerComponent implements OnInit {
       this.clear();
     }
     else if(timerOption === TimerOption.ShowFixedTime){
-      this.showFixedTime();
+
+      if(this.info.totalTime !== undefined){
+        this.showFixedTime();
+      }
+      else {
+        if (this.interval) {
+          clearInterval(this.interval);
+        }
+        var now = new Date().getTime();
+        var distance = this.info.endTime.getTime() - now;    
+        let timeSpan = this.dateService.convertMiliseconds(distance);
+        this.countdownString = this.dateService.transformIntoString(timeSpan, this.info.visualOptions === TimerVisualOption.Small);      }
+
     }
   }
 
+  private countTime(){
+
+  }
 
 
   private startTimer() : void {
 
     var interval = setInterval(() => {
-     this.showFixedTime();
-
-      console.log("countdown " + this.countdownString);
+      var now = new Date().getTime();
+      var distance = this.info.endTime.getTime() - now;
+      let timeSpan = this.dateService.convertMiliseconds(distance);
+      this.countdownString = this.dateService.transformIntoString(timeSpan, this.info.visualOptions === TimerVisualOption.Small);
+  
+      if (distance <= 0) {
+        clearInterval(this.interval);
+        this.countdownString = "0";
+      }
     }, 1000);
 
     this.interval = interval;
@@ -66,18 +86,7 @@ export class TimerComponent implements OnInit {
   }
 
   private showFixedTime() : void{
-    var now = new Date().getTime();
-
-    var distance = this.info.endTime.getTime() - now;
-
-    let timeSpan = this.dateService.convertMiliseconds(distance);
-
-    this.countdownString = this.dateService.transformIntoString(timeSpan, this.info.visualOptions === TimerVisualOption.Small);
-
-    if (distance <= 0) {
-      clearInterval(this.interval);
-      this.countdownString = "0";
-    }
+    this.countdownString = this.dateService.transformIntoString(this.info.totalTime, this.info.visualOptions === TimerVisualOption.Small);
   }
 }
 
