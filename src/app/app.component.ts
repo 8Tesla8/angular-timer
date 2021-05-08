@@ -1,8 +1,4 @@
 import { Component } from '@angular/core';
-import {
-  DateTimeService,
-  ReadableTimeSpan,
-} from './services/date-time.service';
 import { TimerOption, TimerVisualOption } from './timer.models/timer-enum';
 import { TimerInfo } from './timer.models/timer-info.model';
 
@@ -21,13 +17,11 @@ export class AppComponent {
 
   public timersInfo: Array<TimerInfo> = [];
 
-  private dateService = new DateTimeService();
-
   public addTimer(): void {
     let info = new TimerInfo();
 
     if (this.timerOptions === TimerOption.Countdown) {
-      info.endTime = this.dateService.getTimeUtc(this.getTimerTime());
+      info.endTime = this.getTimerTime();
     } else if (this.timerOptions === TimerOption.ShowFixedTime) {
       info.totalTime = this.getTimeSpan();
     }
@@ -37,7 +31,7 @@ export class AppComponent {
 
     this.timersInfo.push(info);
 
-    this.clearProps();
+    this.clearProperties();
   }
 
   public remove(index: number): void {
@@ -54,24 +48,22 @@ export class AppComponent {
   }
 
   public clear(index: number): void {
-    this.changeTimerType(index, TimerOption.Clear);
-  }
-
-  public fixed(index: number): void {
-    this.changeTimerType(index, TimerOption.ShowFixedTime);
-  }
-
-  private changeTimerType(index: number, timerOption: TimerOption): void {
-    let prev = this.timersInfo[index];
-
     let info = new TimerInfo();
-    info.endTime = prev.endTime;
-    info.totalTime = prev.totalTime;
-    info.type = timerOption;
-    info.visualOptions = prev.visualOptions;
+    info.type = TimerOption.Clear;
+    info.id = this.timersInfo[index].id;
 
     this.timersInfo[index] = info;
   }
+
+  public fixed(index: number): void {
+    let info = new TimerInfo();
+    info.type = TimerOption.ShowFixedTime;
+    info.totalTime = this.getTimeSpan();
+    info.id = this.timersInfo[index].id;
+    
+    this.timersInfo[index] = info;
+  }
+
 
   private getTimerTime(): Date {
     let dt = new Date();
@@ -88,22 +80,34 @@ export class AppComponent {
     return dt;
   }
 
-  private getTimeSpan(): ReadableTimeSpan {
-    let ts = new ReadableTimeSpan();
+  private getTimeSpan(): string {
+    let ts = "";
+
     if (this.hours) {
-      ts.hours = this.hours;
+      ts += this.hours + ":";
     }
+    else{
+      ts+= "00:";
+    }
+
     if (this.minutes) {
-      ts.minutes = this.minutes;
+      ts += this.minutes + ":";
     }
+    else {
+      ts+= "00:";
+    }
+
     if (this.seconds) {
-      ts.seconds = this.seconds;
+      ts += this.seconds;
+    }
+    else {
+      ts += "00";
     }
 
     return ts;
   }
 
-  private clearProps(): void {
+  private clearProperties(): void {
     this.hours = undefined;
     this.minutes = undefined;
     this.seconds = undefined;

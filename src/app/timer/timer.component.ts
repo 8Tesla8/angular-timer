@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { DateTimeService } from '../services/date-time.service';
 import { TimerOption, TimerVisualOption } from '../timer.models/timer-enum';
 import { TimerInfo } from '../timer.models/timer-info.model';
 
@@ -9,6 +8,7 @@ import { TimerInfo } from '../timer.models/timer-info.model';
   styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent {
+  private _info: TimerInfo;
 
   @Input()
   set info(value: TimerInfo) {
@@ -22,71 +22,98 @@ export class TimerComponent {
 
   public countdownString = '';
 
-  public _info: TimerInfo;
-  private interval: ReturnType<typeof setTimeout> ;
-  private dateService = new DateTimeService()
+  //private interval: ReturnType<typeof setTimeout>;
 
   constructor() {}
 
-
-  public checkType (timerOption: TimerOption) : void{
-    if(timerOption === TimerOption.Countdown){
+  public checkType(timerOption: TimerOption): void {
+    if (timerOption === TimerOption.Countdown) {
       this.startTimer();
-    }
-    else if(timerOption === TimerOption.Clear){
+    } else if (timerOption === TimerOption.Clear) {
       this.clear();
-    }
-    else if(timerOption === TimerOption.ShowFixedTime){
-
-      if(this.info.totalTime !== undefined){
-        this.showFixedTime();
-      }
-      else {
-        if (this.interval) {
-          clearInterval(this.interval);
-        }
-        var now = new Date().getTime();
-        var distance = this.info.endTime.getTime() - now;    
-        let timeSpan = this.dateService.convertMiliseconds(distance);
-        this.countdownString = this.dateService.transformIntoString(timeSpan, this.info.visualOptions === TimerVisualOption.Small);      }
-
+    } else if (timerOption === TimerOption.ShowFixedTime) {
+      this.showFixedTime();
     }
   }
 
-  private countTime(){
+  private startTimer(): void {
+    this.clearInterval();
 
-  }
+    this._info.id = setInterval(() => {
+      let showSmall = this._info.visualOptions === TimerVisualOption.Small;
 
-
-  private startTimer() : void {
-
-    var interval = setInterval(() => {
       var now = new Date().getTime();
-      var distance = this.info.endTime.getTime() - now;
-      let timeSpan = this.dateService.convertMiliseconds(distance);
-      this.countdownString = this.dateService.transformIntoString(timeSpan, this.info.visualOptions === TimerVisualOption.Small);
-  
-      if (distance <= 0) {
-        clearInterval(this.interval);
-        this.countdownString = "0";
+      var distance = this._info.endTime.getTime() - now;
+      this.countdownString = this.transformMilisecondInString(distance,showSmall);
+
+      if (distance < 0) {
+        this.clearInterval();
+        this.countdownString = '0';
       }
+      //test
+      console.log('Timer: ' + this.countdownString);
     }, 1000);
-
-    this.interval = interval;
-
   }
-
 
   private clear(): void {
-    if (this.interval) {
-      clearInterval(this.interval);
+    this.clearInterval();
+
+    this.countdownString = '-';
+  }
+
+  private showFixedTime(): void {
+    this.clearInterval();
+
+    let arr = this._info.totalTime.split(':');
+
+    let hours = Number(arr[0]);
+    let minutes = Number(arr[1]);
+    let seconds = Number(arr[2]);
+
+    let showSmall = this._info.visualOptions === TimerVisualOption.Small;
+
+    this.countdownString = this.transform(hours, minutes, seconds, showSmall);
+  }
+
+  private clearInterval(): void{
+    if (this.info.id) {
+      clearInterval(this.info.id);
     }
 
-    this.countdownString = "-";
+    this.info.id = undefined;
   }
 
-  private showFixedTime() : void{
-    this.countdownString = this.dateService.transformIntoString(this.info.totalTime, this.info.visualOptions === TimerVisualOption.Small);
-  }
+  private transformMilisecondInString(miliseconds: number, showSmall: boolean) : string{
+    let hours = Math.floor(
+        (miliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+    let minutes = Math.floor((miliseconds % (1000 * 60 * 60)) / (1000 * 60));
+    let seconds = Math.floor((miliseconds % (1000 * 60)) / 1000);
+
+    let result = this.transform(hours, minutes, seconds, showSmall);
+    return result;
 }
 
+  private transform(
+    hours: number,
+    minutes: number,
+    seconds: number,
+    showSmall: boolean
+  ): string {
+    let result = '';
+
+    if (showSmall) {
+      if (hours > 0) {
+        result = hours + 'h';
+      } else if (minutes > 0) {
+        result = minutes + 'm';
+      } else {
+        result = seconds + 's';
+      }
+    } else {
+      result = hours + 'h:' + minutes + 'm:' + seconds + 's';
+    }
+
+    return result;
+  }
+}
