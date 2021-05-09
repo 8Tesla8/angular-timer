@@ -22,8 +22,6 @@ export class TimerComponent {
 
   public countdownString = '';
 
-  //private interval: ReturnType<typeof setTimeout>;
-
   constructor() {}
 
   public checkType(timerOption: TimerOption): void {
@@ -94,12 +92,7 @@ export class TimerComponent {
     return result;
 }
 
-  private transform(
-    hours: number,
-    minutes: number,
-    seconds: number,
-    showSmall: boolean
-  ): string {
+  private transform( hours: number, minutes: number, seconds: number, showSmall: boolean): string {
     let result = '';
 
     if (showSmall) {

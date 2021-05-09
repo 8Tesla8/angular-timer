@@ -67,15 +67,12 @@ export class AppComponent {
 
   private getTimerTime(): Date {
     let dt = new Date();
-    if (this.hours) {
+    if (this.hours) 
       dt.setHours(dt.getHours() + this.hours);
-    }
-    if (this.minutes) {
+    if (this.minutes) 
       dt.setMinutes(dt.getMinutes() + this.minutes);
-    }
-    if (this.seconds) {
+    if (this.seconds) 
       dt.setSeconds(dt.getSeconds() + this.seconds);
-    }
 
     return dt;
   }
@@ -83,26 +80,20 @@ export class AppComponent {
   private getTimeSpan(): string {
     let ts = "";
 
-    if (this.hours) {
+    if (this.hours) 
       ts += this.hours + ":";
-    }
-    else{
+    else
       ts+= "00:";
-    }
 
-    if (this.minutes) {
+    if (this.minutes) 
       ts += this.minutes + ":";
-    }
-    else {
+    else 
       ts+= "00:";
-    }
 
-    if (this.seconds) {
+    if (this.seconds) 
       ts += this.seconds;
-    }
-    else {
+    else 
       ts += "00";
-    }
 
     return ts;
   }
